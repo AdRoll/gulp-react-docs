@@ -1,0 +1,44 @@
+{
+  "name": "gulp-react-docs",
+  "version": "0.1.0",
+  "description": "A gulp plugin for generating documentation in Markdown format for React components based on their `propTypes`.",
+  "license": "MIT",
+  "main": "index.js",
+  "contributors": [
+    "Mars Jullian <mars@adroll.com>",
+    "Jyri Tuulos <jyri@adroll.com>",
+    "Jessica Grist <jessica.grist@adroll.com>"
+  ],
+  "keywords": [
+    "gulp",
+    "gulpplugin",
+    "plugin",
+    "react",
+    "documentation-generation"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adroll/gulp-react-docs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/adroll/gulp-react-docs/issues"
+  },
+  "dependencies": {
+    "handlebars": "^4.0.5",
+    "lodash": "^3.10.1",
+    "react-docgen": "^2.4.0",
+    "through2": "^2.0.0"
+  },
+  "devDependencies": {
+    "del": "^2.2.0",
+    "doctoc": "^0.15.0",
+    "gulp": "^3.9.0",
+    "gulp-concat": "^2.6.0",
+    "gulp-load-plugins": "^1.1.0",
+    "gulp-tap": "^0.1.3",
+    "gulp-util": "^3.0.7"
+  },
+  "engines": {
+    "node": ">= 0.10"
+  }
+}
