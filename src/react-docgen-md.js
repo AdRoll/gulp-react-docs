@@ -63,6 +63,9 @@ Handlebars.registerHelper('whichPartial', function(type) {
     return type && _.contains(partials, type.name) ? type.name : 'catchAll';
 });
 
+Handlebars.registerHelper('name', function(componentName, displayName) {
+  return displayName || componentName;
+});
 /********************************************************
  * General helpers                                      *
  ********************************************************/
@@ -86,6 +89,12 @@ Handlebars.registerHelper('indent', function(indentLevel, options) {
     return lines.join('\n');
 });
 
+Handlebars.registerHelper('each_with_sort', function(obj, opts) {
+    return _(obj).keys().sort().reduce(function(s, key) {
+        return s + opts.fn({ key: key, value: obj[key]});
+    }, '');
+});
+
 /********************************************************
  * Top-level handlebars template                        *
  ********************************************************/
@@ -93,29 +102,34 @@ Handlebars.registerHelper('indent', function(indentLevel, options) {
 var reactDocgenTemplate = Handlebars.compile('\
 ## {{componentName}}\n\n\
 {{#if srcLink }}From [`{{srcLink}}`]({{srcLink}})\n\n\{{/if}}\
-{{#if description}}{{{description}}}\n\n{{/if}}\
-{{#each props}}\
-#### {{@key}}\n\n\
-```js\n\
-{{#if this.required}}// Required\n{{/if}}\
-{{#if this.defaultValue}}// Default: {{{this.defaultValue.value}}}\n{{/if}}\
-{{@key}}: {{> (whichPartial this.type) this.type level=0}}\n\
-```\n\n\
+{{#each components}}\
+{{#if this.displayName}}### {{this.displayName}}\n\n\{{/if}}\
 {{#if this.description}}{{{this.description}}}\n\n{{/if}}\
-{{/each}}\
-<br><br>\n');
+{{#each_with_sort this.props}}\
+#### {{key}}\n\n\
+```js\n\
+{{#if value.required}}// Required\n{{/if}}\
+{{#if value.defaultValue}}// Default: {{{value.defaultValue.value}}}\n{{/if}}\
+{{key}}: {{> (whichPartial value.type) value.type level=0}}\n\
+```\n\n\
+{{#if value.description}}{{{value.description}}}\n\n{{/if}}\
+{{/each_with_sort}}\
+<br><br>\n\
+{{/each}}');
 
 /********************************************************
  * Documentation generator using react-docgen           *
  ********************************************************/
 
 var reactDocgenMarkdown = function(componentSrc, options) {
-    var docs = reactDocs.parse(componentSrc);
+    var docs = reactDocs.parse(componentSrc,options.resolver);
+    if (!docs instanceof Array) {
+      docs = [docs];
+    }
     return reactDocgenTemplate({
         srcLink         : options.srcLink,
         componentName   : options.componentName,
-        description     : docs.description,
-        props           : sortObjectByKey(docs.props)
+        components      : docs
     });
 };
 
