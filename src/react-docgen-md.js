@@ -63,9 +63,6 @@ Handlebars.registerHelper('whichPartial', function(type) {
     return type && _.contains(partials, type.name) ? type.name : 'catchAll';
 });
 
-Handlebars.registerHelper('name', function(componentName, displayName) {
-  return displayName || componentName;
-});
 /********************************************************
  * General helpers                                      *
  ********************************************************/
