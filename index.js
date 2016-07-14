@@ -11,6 +11,8 @@ var reactDocgenMarkdown = require('./src/react-docgen-md');
 var PLUGIN_NAME = 'gulp-react-docs';
 
 module.exports = function(options) {
+    options = options || {};
+    
     return through.obj(function(file, encoding, cb) {
         if (file.isNull()) {
             return cb(null, file);
