@@ -12,7 +12,7 @@ var PLUGIN_NAME = 'gulp-react-docs';
 
 module.exports = function(options) {
     options = options || {};
-    
+
     return through.obj(function(file, encoding, cb) {
         if (file.isNull()) {
             return cb(null, file);
@@ -44,8 +44,8 @@ module.exports = function(options) {
             var markdownDoc = reactDocgenMarkdown(file.contents, {
                 componentName   : gUtil.replaceExtension(file.relative, ''),
                 srcLink         : srcLink
-            });
-            
+            }, options.templates || {});
+
             // replace the file contents and extension
             file.contents = new Buffer(markdownDoc);
             file.path = gUtil.replaceExtension(file.path, '.md');
