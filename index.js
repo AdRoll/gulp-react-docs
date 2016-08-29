@@ -43,6 +43,7 @@ module.exports = function(options) {
             // get the markdown documentation for the file
             var markdownDoc = reactDocgenMarkdown(file.contents, {
                 componentName   : gUtil.replaceExtension(file.relative, ''),
+                relativePath    : file.relative,
                 srcLink         : srcLink
             }, options.templates || {});
 
