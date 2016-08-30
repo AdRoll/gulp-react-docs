@@ -104,11 +104,11 @@ function merge(defaults, overrides) {
     return merged;
 }
 
-var reactDocgenMarkdown = function(componentSrc, options, templates) {
+var reactDocgenMarkdown = function(componentSrc, options) {
     var docs = reactDocs.parse(componentSrc);
 
-    var partialsOverride = templates.partials || {};
-    var helpersOverride = templates.helpers || {};
+    var partialsOverride = options.partials || {};
+    var helpersOverride = options.helpers || {};
 
     var mergedPartials = merge(defaultPartials, partialsOverride);
     Object.keys(mergedPartials).forEach(function (key) {

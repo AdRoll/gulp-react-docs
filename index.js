@@ -44,8 +44,10 @@ module.exports = function(options) {
             var markdownDoc = reactDocgenMarkdown(file.contents, {
                 componentName   : gUtil.replaceExtension(file.relative, ''),
                 relativePath    : file.relative,
-                srcLink         : srcLink
-            }, options.templates || {});
+                srcLink         : srcLink,
+                partials        : options.partials || {},
+                helpers         : options.helpers || {},
+            });
 
             // replace the file contents and extension
             file.contents = new Buffer(markdownDoc);
