@@ -13,86 +13,42 @@ var sortObjectByKey = function(obj){
     }, {});
 };
 
-/********************************************************
- * Prop type partials and handblebars helpers           *
- ********************************************************/
-
-Handlebars.registerPartial('catchAll', '{{name}}');
-
-// Basic prop types
-Handlebars.registerPartial('func', 'Function');
-Handlebars.registerPartial('array', 'Array');
-Handlebars.registerPartial('object', 'Object');
-Handlebars.registerPartial('string', 'String');
-Handlebars.registerPartial('number', 'Number');
-Handlebars.registerPartial('bool', 'Boolean');
-Handlebars.registerPartial('node', 'ReactNode');
-Handlebars.registerPartial('element', 'ReactElement');
-Handlebars.registerPartial('any', '*');
-Handlebars.registerPartial('custom', '{{raw}} (custom validator)');
-
-// composed prop types
-Handlebars.registerPartial('arrayOf', '[{{> (whichPartial value) value level=level}}, ...]');
-
-Handlebars.registerPartial('shape', '{\n\
+var defaultPartials = {
+    'catchAll': '{{name}}',
+    'func': 'Function',
+    'array': 'Array',
+    'object': 'Object',
+    'string': 'String',
+    'number': 'Number',
+    'bool': 'Boolean',
+    'node': 'ReactNode',
+    'element': 'ReactElement',
+    'any': '*',
+    'custom': '{{raw}} (custom validator)',
+    'arrayOf': '[{{> (whichPartial value) value level=level}}, ...]',
+    'shape': '{\n\
 {{#indent level}}\
 {{#each value}}\
     {{@key}}: {{> (whichPartial this) this level=(addLevel ../level)}}\n\
 {{/each}}\n\
 }\
-{{/indent}}');
-
-Handlebars.registerPartial('enum', '(\
+{{/indent}}',
+    'enum': '(\
 {{#each value}}\
 {{this.value}}{{#unless @last}}|{{/unless}}\
 {{/each}}\
-)');
-
-Handlebars.registerPartial('union', '(\
+)',
+    'union': '(\
 {{#each value}}\
 {{> (whichPartial this) this level=../level}}{{#unless @last}}|{{/unless}}\
 {{/each}}\
-)');
-
-// Partial helper. Tells us which partial to use based on the "propType" name
-Handlebars.registerHelper('whichPartial', function(type) {
-    var partials = [
-        'any', 'array', 'arrayOf', 'bool', 'custom', 'element', 'enum', 'func',
-        'node', 'number', 'object', 'shape', 'string', 'union'
-    ];
-    return type && _.contains(partials, type.name) ? type.name : 'catchAll';
-});
-
-/********************************************************
- * General helpers                                      *
- ********************************************************/
-
-// math helper
-Handlebars.registerHelper('addLevel', function(level) { return level + 1; });
-
-// loop helper
-Handlebars.registerHelper('indent', function(indentLevel, options) {
-    var content = options.fn(this),
-        lines = content.split('\n'),
-        indentString = '';
-
-    // build the indent string we need for this indent level
-    for (var i = 0; i < indentLevel; i++) {
-        indentString += '    ';
-    }
-
-    // add then indents to each line
-    lines = lines.map(function(line) { return line = indentString + line; });
-    return lines.join('\n');
-});
-
-/********************************************************
- * Top-level handlebars template                        *
- ********************************************************/
-
-var reactDocgenTemplate = Handlebars.compile('\
-## {{componentName}}\n\n\
+)',
+    'imports': '\
 {{#if srcLink }}From [`{{srcLink}}`]({{srcLink}})\n\n\{{/if}}\
+',
+    'document': '\
+## {{componentName}}\n\n\
+{{> imports }}\
 {{#if description}}{{{description}}}\n\n{{/if}}\
 {{#each props}}\
 #### {{@key}}\n\n\
@@ -103,19 +59,89 @@ var reactDocgenTemplate = Handlebars.compile('\
 ```\n\n\
 {{#if this.description}}{{{this.description}}}\n\n{{/if}}\
 {{/each}}\
-<br><br>\n');
+<br><br>\n',
+};
+var defaultHelpers = {
+    'whichPartial': function(type) {
+        var partials = [
+            'any', 'array', 'arrayOf', 'bool', 'custom', 'element', 'enum', 'func',
+            'node', 'number', 'object', 'shape', 'string', 'union'
+        ];
+        return type && _.contains(partials, type.name) ? type.name : 'catchAll';
+    },
+    'addLevel': function(level) {
+        return level + 1;
+    },
+    'indent': function(indentLevel, options) {
+        var content = options.fn(this),
+            lines = content.split('\n'),
+            indentString = '';
+
+        // build the indent string we need for this indent level
+        for (var i = 0; i < indentLevel; i++) {
+            indentString += '    ';
+        }
+
+        // add then indents to each line
+        lines = lines.map(function(line) { return line = indentString + line; });
+        return lines.join('\n');
+    },
+};
+
 
 /********************************************************
  * Documentation generator using react-docgen           *
  ********************************************************/
 
+function merge(defaults, overrides) {
+    var merged = {};
+    Object.keys(defaults).forEach(function (key) {
+        merged[key] = defaults[key];
+    });
+    Object.keys(overrides).forEach(function (key) {
+        merged[key] = overrides[key];
+    });
+    return merged;
+}
+
 var reactDocgenMarkdown = function(componentSrc, options) {
     var docs = reactDocs.parse(componentSrc);
+
+    var verbose = options.verbose || false;
+    var partialsOverride = options.partials || {};
+    var helpersOverride = options.helpers || {};
+
+    function log() {
+        var args = Array.prototype.slice.apply(arguments);
+        if (verbose) {
+            console.log.apply(console, args);
+        }
+    }
+
+    var mergedPartials = merge(defaultPartials, partialsOverride);
+    Object.keys(mergedPartials).forEach(function (key) {
+        var override = key in partialsOverride;
+        log('compiling partial:', key, ' - ', override ? 'override' : 'default');
+        Handlebars.registerPartial(key, mergedPartials[key]);
+    });
+
+    var mergedHelpers = merge(defaultHelpers, helpersOverride);
+    Object.keys(mergedHelpers).forEach(function (key) {
+        var override = key in helpersOverride;
+        log('compiling helper:', key, ' - ', override ? 'override' : 'default');
+        Handlebars.registerHelper(key, mergedHelpers[key]);
+    });
+
+    log('compiling template: document');
+    var reactDocgenTemplate = Handlebars.compile('{{> document data }}');
     return reactDocgenTemplate({
-        srcLink         : options.srcLink,
-        componentName   : options.componentName,
-        description     : docs.description,
-        props           : sortObjectByKey(docs.props)
+        data: {
+            relativePath    : options.relativePath,
+            srcLink         : options.srcLink,
+            componentName   : options.componentName,
+            description     : docs.description,
+            props           : sortObjectByKey(docs.props)
+        },
     });
 };
 
