@@ -35,7 +35,8 @@ gulp.task('react-docs', function() {
 
     return gulp.src('./components/**/*.jsx')
         .pipe(reactDocsPlugin({
-            path: docsDest
+            path: docsDest,
+            verbose: true,
         }))
         .pipe($.concat('README.md'))
         .pipe($.tap(function(file) {

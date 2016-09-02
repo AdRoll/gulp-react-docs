@@ -107,24 +107,32 @@ function merge(defaults, overrides) {
 var reactDocgenMarkdown = function(componentSrc, options) {
     var docs = reactDocs.parse(componentSrc);
 
+    var verbose = options.verbose || false;
     var partialsOverride = options.partials || {};
     var helpersOverride = options.helpers || {};
+
+    function log() {
+        var args = Array.prototype.slice.apply(arguments);
+        if (verbose) {
+            console.log.apply(console, args);
+        }
+    }
 
     var mergedPartials = merge(defaultPartials, partialsOverride);
     Object.keys(mergedPartials).forEach(function (key) {
         var override = key in partialsOverride;
-        console.log('compiling partial:', key, ' - ', override ? 'override' : 'default');
+        log('compiling partial:', key, ' - ', override ? 'override' : 'default');
         Handlebars.registerPartial(key, mergedPartials[key]);
     });
 
     var mergedHelpers = merge(defaultHelpers, helpersOverride);
     Object.keys(mergedHelpers).forEach(function (key) {
         var override = key in helpersOverride;
-        console.log('compiling helper:', key, ' - ', override ? 'override' : 'default');
+        log('compiling helper:', key, ' - ', override ? 'override' : 'default');
         Handlebars.registerHelper(key, mergedHelpers[key]);
     });
 
-    console.log('compiling template: document');
+    log('compiling template: document');
     var reactDocgenTemplate = Handlebars.compile('{{> document data }}');
     return reactDocgenTemplate({
         data: {
