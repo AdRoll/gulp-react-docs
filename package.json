@@ -27,7 +27,7 @@
     "gulp-util": "^3.0.7",
     "handlebars": "^4.0.5",
     "lodash": "^3.10.1",
-    "react-docgen": "2.7.0",
+    "react-docgen": "2.19.0",
     "through2": "^2.0.0"
   },
   "devDependencies": {
