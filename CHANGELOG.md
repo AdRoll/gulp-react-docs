@@ -1,8 +1,12 @@
 # gulp-react-docs Change Log
 
+## 0.1.3 (2017-12-13)
+
+Upgraded `react-docgen` to `^2.20.0`. Fixes https://github.com/AdRoll/gulp-react-docs/issues/7
+
 ## 0.1.2 (2016-07-14)
 
-- Make the `options` argument optional and make `gulp-util` a production dependency (https://github.com/AdRoll/gulp-react-docs/pull/4)
+Make the `options` argument optional and make `gulp-util` a production dependency (https://github.com/AdRoll/gulp-react-docs/pull/4)
 
 ## 0.1.1 (2016-04-08)
 
