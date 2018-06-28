@@ -60,6 +60,12 @@ If you pass in a string, `path` should be the relative path from the `gulpfile.j
 
 If you pass in a function, `path` is expected to return a string. The return value can be either a relative from where the generated documentation will be output to the source code, or an absolute path / URL pointing to the source code.
 
+#### resolver
+
+* Type: `function`
+
+A resolver function to pass into react-docgen for identifying React Components from source code. The default resolver recognizes all React Components exported from a module, to supply your own custom resolver function, see the [react-docgen](https://github.com/reactjs/react-docgen) docs for more information.
+
 ## Contributors
 
 - [@marsjosephine](https://github.com/marsjosephine)
