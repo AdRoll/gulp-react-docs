@@ -1,14 +1,9 @@
 // external dependencies
-var gUtil = require('gulp-util'),
-    PluginError = gUtil.PluginError,
-    through = require('through2'),
+var through = require('through2'),
     path = require('path');
 
 // internal dependencies
 var reactDocgenMarkdown = require('./src/react-docgen-md');
-
-// consts
-var PLUGIN_NAME = 'gulp-react-docs';
 
 module.exports = function(options) {
     options = options || {};
@@ -19,7 +14,7 @@ module.exports = function(options) {
         }
 
         if (file.isStream()) {
-            this.emit('error', new PluginError(PLUGIN_NAME, 'Streams not supported!'));
+            throw new Error('Streams not supported!')
 
         } else if (file.isBuffer()) {
 
@@ -42,13 +37,13 @@ module.exports = function(options) {
 
             // get the markdown documentation for the file
             var markdownDoc = reactDocgenMarkdown(file.contents, {
-                componentName   : gUtil.replaceExtension(file.relative, ''),
+                componentName   : file.relative.replace(file.extname, ''),
                 srcLink         : srcLink
             });
             
             // replace the file contents and extension
-            file.contents = new Buffer(markdownDoc);
-            file.path = gUtil.replaceExtension(file.path, '.md');
+            file.contents = Buffer.from(markdownDoc);
+            file.path = file.path.replace(file.extname, '.md');
 
             return cb(null, file);
         }

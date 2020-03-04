@@ -60,7 +60,7 @@ Handlebars.registerHelper('whichPartial', function(type) {
         'any', 'array', 'arrayOf', 'bool', 'custom', 'element', 'enum', 'func',
         'node', 'number', 'object', 'shape', 'string', 'union'
     ];
-    return type && _.contains(partials, type.name) ? type.name : 'catchAll';
+    return type && _.includes(partials, type.name) ? type.name : 'catchAll';
 });
 
 /********************************************************
