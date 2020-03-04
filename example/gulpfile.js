@@ -1,36 +1,36 @@
 'use strict';
 
 // Required modules
-var gulp = require('gulp'),
-    path = require('path'),
-    _ = require('lodash'),
-    doctoc = require('doctoc/lib/transform'),
-    del = require('del'),
-    $ = require('gulp-load-plugins')(),
-    reactDocsPlugin = require('../');
+const gulp = require('gulp');
+const doctoc = require('doctoc/lib/transform');
+const del = require('del');
+const $ = require('gulp-load-plugins')();
+const reactDocsPlugin = require('../');
+const { exec } = require('child_process');
 
 // Helper vars
 var docsDest = 'docs';
 
 // Tasks
-gulp.task('default', ['react-docs']);
+gulp.task('clean', function (cb) { 
+    del.sync(docsDest);
+    cb();
+});
 
-gulp.task('clean', function(cb) { del(docsDest, cb) });
-
-gulp.task('check:docs', ['docs'], function(cb) {
-    exec('git diff --name-only docs/', function(err, diffFiles) {
+gulp.task('check:docs', function (cb) {
+    exec('git diff --name-only docs/', function (err, diffFiles) {
         if (diffFiles.indexOf('.md') > -1) {
-            $.util.log('Automatically generated documentation is not up to \
+            console.log('Automatically generated documentation is not up to \
 date with the changes in the codebase. Please run `gulp` and commit the changes.');
             process.exit(1);
         } else {
-            $.util.log('Automatically generated documentation is up to date!');
+            console.log('Automatically generated documentation is up to date!');
         }
         cb();
     });
 });
 
-gulp.task('react-docs', function() {
+gulp.task('react-docs', function () {
     var mdTitle = '# React Component Reference';
 
     return gulp.src('./components/**/*.jsx')
@@ -38,10 +38,12 @@ gulp.task('react-docs', function() {
             path: docsDest
         }))
         .pipe($.concat('README.md'))
-        .pipe($.tap(function(file) {
+        .pipe($.tap(function (file) {
             // Generate table of contents for components.md
             var mdWithToc = doctoc(file.contents.toString(), null, 2, mdTitle).data;
-            file.contents = new Buffer(mdWithToc);
+            file.contents = Buffer.from(mdWithToc);
         }))
         .pipe(gulp.dest(docsDest));
 });
+
+gulp.task('default', gulp.series('react-docs'));
