@@ -1,5 +1,17 @@
 # gulp-react-docs Change Log
 
+## 1.0.0 (2020-03-04)
+
+### BREAKING
+
+- Update `react-docgen` to `5.3.0`
+
+### Improvements
+
+- Upgrade to `gulp@4` for local development
+- Update `lodash` to `4.17.15`
+- Remove `gulp-util` dependency
+
 ## 0.1.3 (2017-12-13)
 
 Upgraded `react-docgen` to `^2.20.0`. Fixes https://github.com/AdRoll/gulp-react-docs/issues/7
