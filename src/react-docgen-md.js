@@ -109,14 +109,25 @@ var reactDocgenTemplate = Handlebars.compile('\
  * Documentation generator using react-docgen           *
  ********************************************************/
 
-var reactDocgenMarkdown = function(componentSrc, options) {
-    var docs = reactDocs.parse(componentSrc);
-    return reactDocgenTemplate({
-        srcLink         : options.srcLink,
-        componentName   : options.componentName,
-        description     : docs.description,
-        props           : sortObjectByKey(docs.props)
-    });
+var reactDocgenMarkdown = function (componentSrc, options) {
+    try {
+        const docs = reactDocs.parse(componentSrc);
+        return reactDocgenTemplate({
+            srcLink: options.srcLink,
+            componentName: options.componentName,
+            description: docs.description,
+            props: sortObjectByKey(docs.props)
+        });
+    } catch (error) {
+        // Fallback for components using multiple exports in the same file
+        const docsList = reactDocs.parse(componentSrc, reactDocs.resolver.findAllExportedComponentDefinitions);
+        return docsList.reduce((acc, docs) => acc + reactDocgenTemplate({
+            srcLink: options.srcLink,
+            componentName: options.componentName,
+            description: docs.description,
+            props: sortObjectByKey(docs.props)
+        }) + '\n', '');
+    }
 };
 
 module.exports = reactDocgenMarkdown;
