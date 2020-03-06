@@ -1,6 +1,6 @@
 {
   "name": "gulp-react-docs",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A gulp plugin for generating documentation in Markdown format for React components based on their `propTypes`.",
   "license": "MIT",
   "main": "index.js",
