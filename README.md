@@ -22,7 +22,7 @@ Install package with [npm](http://npmjs.org/) and add it to your development dep
 </tr>
 <tr>
 <td>Node Version</td>
-<td>>= 0.10</td>
+<td>>= 10</td>
 </tr>
 </table>
 
